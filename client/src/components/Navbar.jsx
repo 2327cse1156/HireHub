@@ -1,19 +1,21 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { assets } from '../assets/assets';
 import { useClerk, UserButton, useUser } from "@clerk/clerk-react";
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Menu, X } from 'lucide-react'; // using Lucide icons
+import { AppContext } from '../context/AppContext';
 
 const Navbar = () => {
   const { openSignIn } = useClerk();
   const { user } = useUser();
   const [menuOpen, setMenuOpen] = useState(false);
-
+  const navigate=useNavigate();
+  const {setShowRecruiterLogin}=useContext(AppContext)
   return (
     <nav className="bg-white shadow-md py-4">
       <div className="container mx-auto flex justify-between items-center px-4 md:px-8 2xl:px-20">
         {/* Logo */}
-        <img src={assets.logo} alt="logo" className="h-10 sm:h-12 w-auto" />
+        <img onClick={()=>navigate("/")}  src={assets.logo} alt="logo" className="h-10 sm:h-12 w-auto cursor-pointer" />
 
         {/* Mobile Menu Icon */}
         <div className="md:hidden">
@@ -37,7 +39,7 @@ const Navbar = () => {
             </>
           ) : (
             <>
-              <button className="text-gray-700 hover:text-blue-600 text-sm md:text-base transition-colors">
+              <button onClick={e=>setShowRecruiterLogin(true)} className="text-gray-700 hover:text-blue-600 text-sm md:text-base transition-colors">
                 Recruiter Login
               </button>
               <button
