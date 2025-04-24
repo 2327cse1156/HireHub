@@ -28,7 +28,7 @@ const ManageJobs = () => {
               <tr key={index} className="border-t hover:bg-gray-50 transition duration-200">
                 <td className="px-4 py-3">{index + 1}</td>
                 <td className="px-4 py-3 font-medium">{job.title}</td>
-                <td className="px-4 py-3">{moment(job.date).format("MMM D,YYYY")}</td>
+                <td className="px-4 py-3">{moment(job.date).format("MMM D, YYYY")}</td>
                 <td className="px-4 py-3">{job.location}</td>
                 <td className="px-4 py-3">{job.applicants}</td>
                 <td className="px-4 py-3 text-center">
