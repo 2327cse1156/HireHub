@@ -1,37 +1,20 @@
-import "./config/instrument.js";
-import express from "express";
-import cors from "cors";
-import "dotenv/config";
-import connectDB from "./config/db.js";
-import * as Sentry from "@sentry/node";
-import { clerkWebhooks } from "./controllers/webhooks.js";
-
+import express, { json } from 'express';
+import cors from 'cors';
+import dotenv from "dotenv";
+import connectDB from './config/db.js';
+dotenv.config();
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 5000;
 
-Sentry.setupExpressErrorHandler(app);
-
-// Connect to database
-await connectDB();
-
-// Middleware (Apply raw ONLY for webhook route)
-app.use("/webhooks", express.raw({ type: "application/json" }));
-
-// Now apply global middlewares
+// Middleware
 app.use(cors());
-app.use(express.json());
+app.use(json());
 
-// Routes
-app.get("/", (req, res) => {
-  res.send("Welcome to the Job Portal Server!");
+// Basic route
+app.get('/', (req, res) => {
+  res.send('Welcome to the Job Portal API');
 });
-
-app.get("/debug-sentry", function mainHandler(req, res) {
-  throw new Error("My First Sentry error!");
-});
-
-// Clerk webhook route
-app.post("/webhooks", clerkWebhooks);
+await connectDB();
 
 // Start the server
 app.listen(PORT, () => {
