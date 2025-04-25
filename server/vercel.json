@@ -5,9 +5,9 @@
             "src": "server.js",
             "use": "@vercel/node",
             "config": {
-                "includeFiles" : [
-                    "dist/**"
-                ]
+            "includeFiles": [
+                "dist/**"
+            ]
             }
         }
     ],

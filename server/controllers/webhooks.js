@@ -26,15 +26,8 @@ export const clerkWebhooks = async (req, res) => {
           image: data.image_url || data.profile_image_url, // Fallback to profile_image_url if image_url is missing
           resume: "", // Placeholder for the resume field
         };
-
-        // Check if the user already exists to avoid duplicate entries
-        const existingUser = await User.findById(data.id);
-        if (!existingUser) {
-          await User.create(userData);
-          console.log("User created:", userData);
-        } else {
-          console.log("User already exists:", data.id);
-        }
+        await User.create(userData)
+        res.json({})
         break;
       }
 
@@ -44,14 +37,14 @@ export const clerkWebhooks = async (req, res) => {
           name: `${data.first_name} ${data.last_name}`,
           image: data.image_url || data.profile_image_url,
         };
-        await User.findByIdAndUpdate(data.id, updatedData);
-        console.log("User updated:", updatedData);
+        await User.findByIdAndUpdate(data.id, userData);
+        res.json({});
         break;
       }
 
       case "user.deleted": {
         await User.findByIdAndDelete(data.id);
-        console.log("User deleted:", data.id);
+        res.json({});
         break;
       }
 
