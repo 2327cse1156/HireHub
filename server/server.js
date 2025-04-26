@@ -5,12 +5,15 @@ import dotenv from "dotenv";
 import * as Sentry from "@sentry/node"
 import connectDB from './config/db.js';
 import { clerkWebhooks } from "./controllers/webhooks.js";
+import companyRoutes from "./routes/companyRoutes.js";
+import connectCloudinary from "./config/cloudinary.js";
 dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 Sentry.setupExpressErrorHandler(app);
 
 await connectDB();
+await connectCloudinary();
 // Middleware
 app.use(cors());
 app.use(json());
@@ -22,7 +25,11 @@ app.get('/', (req, res) => {
 app.get("/debug-sentry",function mainHandler(req,res){
   throw new Error("My first Sentry error!");
 })
+// For Express.js
+app.get('/favicon.ico', (req, res) => res.status(204).end());
+
 app.post("/webhooks",clerkWebhooks)
+app.use("/api/company",companyRoutes)
 
 
 
