@@ -7,6 +7,7 @@ import connectDB from './config/db.js';
 import { clerkWebhooks } from "./controllers/webhooks.js";
 import companyRoutes from "./routes/companyRoutes.js";
 import connectCloudinary from "./config/cloudinary.js";
+import jobRoutes from "./routes/jobRoutes.js";
 dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -30,7 +31,7 @@ app.get('/favicon.ico', (req, res) => res.status(204).end());
 
 app.post("/webhooks",clerkWebhooks)
 app.use("/api/company",companyRoutes)
-
+app.use("/api/jobs",jobRoutes)
 
 
 // Start the server
