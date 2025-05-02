@@ -8,7 +8,7 @@ import axios from "axios";
 const ManageJobs = () => {
   const navigate = useNavigate();
 
-  const [jobs, setJobs] = useState([]);
+  const [jobs, setJobs] = useState(false);
 
   // function to fetch company job application data
   const { backerendUrl, companyToken } = useContext(AppContext);
@@ -18,24 +18,43 @@ const ManageJobs = () => {
         backerendUrl + "/api/company/list-jobs",
         { headers: { token: companyToken } }
       );
-      if(data.success) {
-        setJobs(data.jobsData.reverse())
-        console.log(data.jobsData)
+      if (data.success) {
+        setJobs(data.jobsData.reverse());
+        console.log(data.jobsData);
       } else {
         toast.error(data.message);
       }
     } catch (error) {
-      toast.error(error.message)
+      toast.error(error.message);
     }
   };
 
-  useEffect(() =>{
-    if(companyToken){
-      fetchCompnayJobs()
+  const changeJobVisibility = async (id) => {
+    try {
+      const { data } = await axios.post(
+        backerendUrl + "/api/company/change-job-visibility",
+        { id },
+        { headers: { token: companyToken } }
+      );
+      if (data.success) {
+        toast.success(data.message);
+        fetchCompnayJobs();
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error(error.message);
     }
-  },[companyToken])
+  };
+  useEffect(() => {
+    if (companyToken) {
+      fetchCompnayJobs();
+    }
+  }, [companyToken]);
 
-  return (
+  return jobs ? jobs.length === 0 ? (<div>
+    <p>NO JOBS AVAILABLE OR POSTED</p>
+  </div>) : (
     <div className="px-4 py-6 sm:px-6 lg:px-8 max-w-7xl mx-auto">
       <h2 className="text-3xl font-bold mb-6 text-gray-800">Manage Jobs</h2>
 
@@ -67,6 +86,7 @@ const ManageJobs = () => {
                 <td className="px-4 py-3">{job.applicants}</td>
                 <td className="px-4 py-3 text-center">
                   <input
+                    onChange={() => changeJobVisibility(job._id)}
                     className="scale-125 ml-4"
                     type="checkbox"
                     checked={job.visible}
@@ -87,7 +107,7 @@ const ManageJobs = () => {
         </button>
       </div>
     </div>
-  );
+  ):<Loading></Loading>
 };
 
 export default ManageJobs;

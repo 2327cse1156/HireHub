@@ -19,8 +19,10 @@ Sentry.setupExpressErrorHandler(app);
 await connectDB();
 await connectCloudinary();
 // Middleware
+app.use(clerkMiddleware())
 app.use(cors());
 app.use(json());
+
 
 // Basic route
 app.get('/', (req, res) => {
@@ -36,7 +38,7 @@ app.post("/webhooks",clerkWebhooks)
 app.use("/api/company",companyRoutes)
 app.use("/api/jobs",jobRoutes)
 app.use("/api/users",userRoutes)
-app.use(clerkMiddleware())
+
 
 
 // Start the server

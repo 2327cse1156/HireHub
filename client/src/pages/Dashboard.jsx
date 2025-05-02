@@ -69,7 +69,7 @@ const Dashboard = () => {
               <p className="sm:inline hidden">Add Job</p>
             </NavLink>
 
-            <NavLink className={navLinkClasses} to="/dashboard/manage-job">
+            <NavLink className={navLinkClasses} to="/dashboard/manage-jobs">
               <img className="w-5 h-5" src={assets.home_icon} alt="Manage Jobs" />
               <p className="sm:inline hidden">Manage Jobs</p>
             </NavLink>

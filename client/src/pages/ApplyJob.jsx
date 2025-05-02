@@ -10,36 +10,81 @@ import JobCard from "../components/JobCard";
 import Footer from "../components/Footer";
 import axios from "axios";
 import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@clerk/clerk-react";
+
 const ApplyJob = () => {
   const { id } = useParams();
 
+  const navigate = useNavigate();
   const [jobData, setJobData] = useState(null);
+  const [isApplied, setIsApplied] = useState(false);
+  const { jobs, backendUrl, userData, userApplications , fetchUserApplications } =
+    useContext(AppContext);
 
-  const { jobs,backendUrl } = useContext(AppContext);
-
+  const { getToken } = useAuth();
   const fetchJob = async () => {
-
     try {
-      const {data} = await axios.get(backendUrl + `/api/jobs/${id}`);
+      const { data } = await axios.get(backendUrl + `/api/jobs/${id}`);
 
-    if (data.success) {
-      setJobData(data.job);
-    }
-    else{
-      toast.error(data.message)
-    }
+      if (data.success) {
+        setJobData(data.job);
+      } else {
+        toast.error(data.message);
+      }
     } catch (error) {
-      toast.error(error.message)
+      toast.error(error.message);
     }
-    
-
-
   };
 
+  const applyHandler = async () => {
+    try {
+      if (!userData) {
+        toast.error("Please login to apply for this job.");
+        return;
+      }
+      if (!userData.resume) {
+        navigate("/applications");
+        toast.error("Please upload your resume to apply for this job.");
+        return;
+      }
+
+      const token = await getToken();
+
+      const { data } = await axios.post(
+        backendUrl + "/api/users/apply",
+        { jobId: jobData._id },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      if (data.success) {
+        toast.success(data.message);
+        fetchUserApplications()
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error(error.message);
+    }
+  };
+
+  const checkIfApplied = () => {
+    if (userApplications.length > 0) {
+      const hasApplied = userApplications.some(
+        (application) => application.jobId._id === JobData._id
+      );
+      setIsApplied(hasApplied) ;
+    }
+    return false;
+  }
   useEffect(() => {
     fetchJob();
   }, [id, jobs]);
 
+  useEffect(() => {
+    if (jobData) {
+      checkIfApplied();
+    }
+  }, [JobData, userApplications,id]);  
   return jobData ? (
     <>
       <Navbar />
@@ -93,8 +138,11 @@ const ApplyJob = () => {
               </div>
             </div>
             <div className="flex flex-col justify-center text-end max-md:mx-auto max-md:text-center">
-              <button className="bg-blue-600 hover:bg-blue-700 transition-colors duration-200 px-5 py-2.5 text-white font-medium rounded-lg cursor-pointer shadow-md">
-                Apply Now
+              <button
+                onClick={applyHandler}
+                className="bg-blue-600 hover:bg-blue-700 transition-colors duration-200 px-5 py-2.5 text-white font-medium rounded-lg cursor-pointer shadow-md"
+              >
+                {isApplied ? "Applied" : "Apply Now"}
               </button>
               <p className="mt-2 text-gray-500 text-sm">
                 Posted {moment(jobData.date).fromNow()}
@@ -113,7 +161,10 @@ const ApplyJob = () => {
                 className="job-description space-y-6 text-sm sm:text-base text-gray-700 leading-relaxed"
                 dangerouslySetInnerHTML={{ __html: jobData.description }}
               ></div>
-              <button className="mt-10 bg-blue-600 hover:bg-blue-700 transition-colors duration-200 px-5 py-2.5 text-white font-medium rounded-lg cursor-pointer shadow-md">
+              <button
+                onClick={applyHandler}
+                className="mt-10 bg-blue-600 hover:bg-blue-700 transition-colors duration-200 px-5 py-2.5 text-white font-medium rounded-lg cursor-pointer shadow-md"
+              >
                 Apply Now
               </button>
             </div>

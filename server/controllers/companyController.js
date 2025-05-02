@@ -5,6 +5,7 @@ import { v2 as cloudinary } from "cloudinary";
 import generateToken from "../utils/generateToken.js";
 import { messageInRaw } from "svix";
 import Job from "../models/Job.js";
+import JobApplication from "../models/JobApplications.js";
 export const registerCompany = async (req, res) => {
   const { name, email, password } = req.body;
   const imageFile = req.file;
@@ -120,7 +121,27 @@ export const postJob = async (req, res) => {
 
 // get company job applicants
 
-export const getCompanyJobApplicants = async (req, res) => {};
+export const getCompanyJobApplicants = async (req, res) => {
+  try {
+    const companyId = req.company._id;
+    // find job applications by companyId
+    const applications = await JobApplication.find({
+      companyId,
+    })
+      .populate("userId", "name resume image")
+      .populate("jobId", "title location salary level category")
+      .exec();
+    return res.json({
+      success: true,
+      applications,
+    });
+  } catch (error) {
+    res.json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
 
 // get company posted jobs
 
@@ -152,7 +173,24 @@ export const getCompanyPostedJobs = async (req, res) => {
 
 // change job application status
 
-export const jobApplicationStatus = async (req, res) => {};
+export const jobApplicationStatus = async (req, res) => {
+  try {
+    const { id, status } = req.body;
+
+    // find job application data and update status
+    await JobApplication.findOneAndUpdate({ _id: id }, { status });
+
+    res.json({
+      success: true,
+      message: "Job application status updated successfully",
+    });
+  } catch (error) {
+    return res.json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
 
 // change jobVisiblty
 
