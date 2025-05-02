@@ -8,24 +8,36 @@ import kConvert from "k-convert";
 import moment from "moment";
 import JobCard from "../components/JobCard";
 import Footer from "../components/Footer";
+import axios from "axios";
+import toast from "react-hot-toast";
 const ApplyJob = () => {
   const { id } = useParams();
 
   const [jobData, setJobData] = useState(null);
 
-  const { jobs } = useContext(AppContext);
+  const { jobs,backendUrl } = useContext(AppContext);
 
   const fetchJob = async () => {
-    const data = jobs.filter((job) => job._id === id);
-    if (data.length !== 0) {
-      setJobData(data[0]);
+
+    try {
+      const {data} = await axios.get(backendUrl + `/api/jobs/${id}`);
+
+    if (data.success) {
+      setJobData(data.job);
     }
+    else{
+      toast.error(data.message)
+    }
+    } catch (error) {
+      toast.error(error.message)
+    }
+    
+
+
   };
 
   useEffect(() => {
-    if (jobs.length > 0) {
-      fetchJob();
-    }
+    fetchJob();
   }, [id, jobs]);
 
   return jobData ? (
@@ -62,11 +74,19 @@ const ApplyJob = () => {
                     {jobData.location}
                   </span>
                   <span className="flex items-center gap-1">
-                    <img className="w-4 h-4" src={assets.person_icon} alt="Level" />
+                    <img
+                      className="w-4 h-4"
+                      src={assets.person_icon}
+                      alt="Level"
+                    />
                     {jobData.level}
                   </span>
                   <span className="flex items-center gap-1">
-                    <img className="w-4 h-4" src={assets.money_icon} alt="Salary" />
+                    <img
+                      className="w-4 h-4"
+                      src={assets.money_icon}
+                      alt="Salary"
+                    />
                     CTC: {kConvert.convertTo(jobData.salary)}
                   </span>
                 </div>
@@ -86,7 +106,9 @@ const ApplyJob = () => {
           <div className="flex flex-col lg:flex-row justify-between items-start gap-8 lg:gap-16 px-6 sm:px-10 mb-6">
             {/* Job Description */}
             <div className="w-full lg:w-2/3 bg-white p-6 rounded-lg shadow-md border border-gray-200">
-              <h2 className="font-bold text-2xl mb-4 text-gray-800">Job Description</h2>
+              <h2 className="font-bold text-2xl mb-4 text-gray-800">
+                Job Description
+              </h2>
               <div
                 className="job-description space-y-6 text-sm sm:text-base text-gray-700 leading-relaxed"
                 dangerouslySetInnerHTML={{ __html: jobData.description }}
@@ -98,7 +120,9 @@ const ApplyJob = () => {
 
             {/* More Jobs Section */}
             <div className="w-full lg:w-1/3">
-              <h2 className="font-bold text-2xl mb-4 text-gray-800">More Jobs from {jobData.companyId.name}</h2>
+              <h2 className="font-bold text-2xl mb-4 text-gray-800">
+                More Jobs from {jobData.companyId.name}
+              </h2>
               <div className="space-y-6">
                 {jobs
                   .filter(
@@ -115,7 +139,7 @@ const ApplyJob = () => {
           </div>
         </div>
       </div>
-      <Footer/>
+      <Footer />
     </>
   ) : (
     <Loading />

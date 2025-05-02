@@ -56,7 +56,7 @@ export const loginCompany = async (req, res) => {
   try {
     const company = await Company.findOne({ email });
 
-    if (bcrypt.compare(password, company.password)) {
+    if (await bcrypt.compare(password, company.password)) {
       res.json({
         success: true,
         company: {
@@ -129,15 +129,24 @@ export const getCompanyPostedJobs = async (req, res) => {
     const companyId = req.company._id;
     const jobs = await Job.find({ companyId });
     // (Todo) adding no. of applicants info in data
+    const jobsData = await Promise.all(
+      jobs.map(async (job) => {
+        const applicants = await jobApplication.find({ jobId: job._id });
+        return {
+          ...job.toObject(),
+          applicants: applicants.length,
+        };
+      })
+    );
     res.json({
       success: true,
-      jobsData: jobs,
+      jobsData,
     });
   } catch (error) {
     res.json({
       success: false,
       message: error.message,
-    }); 
+    });
   }
 };
 
@@ -148,23 +157,23 @@ export const jobApplicationStatus = async (req, res) => {};
 // change jobVisiblty
 
 export const changeVisibility = async (req, res) => {
-    try {
-        const {id} =req.body
-        const companyId = req.company._id
-        const job = await Job.findById(id)
-        if(companyId.toString() === job.companyId.toString()){
-         job.visible = !job.visible
-         await job.save()
-        }   
-
-        res.json({
-            success:true,
-            job
-        })
-    } catch (error) {
-        res.json({
-            success:false,
-            message:error.message
-        })  
+  try {
+    const { id } = req.body;
+    const companyId = req.company._id;
+    const job = await Job.findById(id);
+    if (companyId.toString() === job.companyId.toString()) {
+      job.visible = !job.visible;
+      await job.save();
     }
+
+    res.json({
+      success: true,
+      job,
+    });
+  } catch (error) {
+    res.json({
+      success: false,
+      message: error.message,
+    });
+  }
 };

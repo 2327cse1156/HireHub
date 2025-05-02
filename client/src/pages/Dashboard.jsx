@@ -1,14 +1,29 @@
-import React from "react";
+import React, {  useContext, useEffect } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { assets } from "../assets/assets";
-
+import { AppContext } from "../context/AppContext";
 const Dashboard = () => {
   const navigate = useNavigate();
+  const  {companyData,setCompanyData,setCompanyToken}=useContext(AppContext);
+
+  // function to logout for company
+  const logout = () =>{
+    setCompanyToken(null)
+    localStorage.removeItem("companyToken")
+    setCompanyData(null)
+    navigate("/")
+  }
+
+  useEffect(() =>{
+    if(companyData){
+      navigate("/dashboard/manage-jobs")
+    }
+  },[companyData])
 
   const navLinkClasses = ({ isActive }) =>
     `flex items-center gap-2 w-full px-4 py-3 sm:px-6 hover:bg-gray-100 transition-colors duration-200
      ${isActive ? "bg-blue-100 border-r-4 border-blue-500 font-medium" : ""}`;
-
+     
   return (
     <div className="min-h-screen flex flex-col">
       {/* Navbar */}
@@ -20,23 +35,27 @@ const Dashboard = () => {
             src={assets.logo}
             alt="HireHub Logo"
           />
-          <div className="flex items-center gap-4">
-            <p className="hidden sm:block text-gray-700">Welcome, HireHub</p>
+           {companyData && (
+            <div className="flex items-center gap-4">
+           
+            <p className="hidden sm:block text-gray-700">Welcome, {companyData.name}</p>
             <div className="relative group">
               <img
                 className="w-9 h-9 object-cover border rounded-full"
-                src={assets.company_icon}
+                src={companyData.image}
                 alt="Profile Icon"
               />
               <div className="absolute hidden group-hover:block top-12 w-32 bg-white border shadow-lg right-0 z-30 rounded">
                 <ul className="text-sm text-gray-800">
-                  <li className="py-2 px-4 cursor-pointer hover:bg-gray-100">
+                  <li onClick={logout} className="py-2 px-4 cursor-pointer hover:bg-gray-100">
                     Logout
                   </li>
                 </ul>
               </div>
             </div>
           </div>
+           )}
+          
         </div>
       </div>
 

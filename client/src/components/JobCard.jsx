@@ -8,7 +8,7 @@ const JobCard = ({ job }) => {
     <div className="border border-gray-200 p-6 rounded-xl shadow-sm hover:shadow-md transition duration-200 bg-white flex flex-col justify-between h-full">
       <div>
         <div className="flex justify-between items-center mb-3">
-          <img src={assets.company_icon} className="h-8 w-8 object-contain" alt="Company Logo" />
+          <img src={job.companyId.image} className="h-8 w-8 object-contain" alt="Company Logo" />
         </div>
         <h4 className="font-semibold text-lg sm:text-xl mb-2 text-gray-800">{job.title}</h4>
         <div className="flex flex-wrap gap-2 text-xs sm:text-sm mb-4">
