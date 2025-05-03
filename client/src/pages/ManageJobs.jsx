@@ -5,17 +5,19 @@ import { useNavigate } from "react-router-dom";
 import { AppContext } from "../context/AppContext";
 import toast from "react-hot-toast";
 import axios from "axios";
+import Loading from "../components/Loading";
+
 const ManageJobs = () => {
   const navigate = useNavigate();
 
-  const [jobs, setJobs] = useState(false);
+  const [jobs, setJobs] = useState(null);
 
   // function to fetch company job application data
-  const { backerendUrl, companyToken } = useContext(AppContext);
+  const { backendUrl, companyToken } = useContext(AppContext);
   const fetchCompnayJobs = async () => {
     try {
       const { data } = await axios.get(
-        backerendUrl + "/api/company/list-jobs",
+        backendUrl + "/api/company/list-jobs",
         { headers: { token: companyToken } }
       );
       if (data.success) {
@@ -32,7 +34,7 @@ const ManageJobs = () => {
   const changeJobVisibility = async (id) => {
     try {
       const { data } = await axios.post(
-        backerendUrl + "/api/company/change-job-visibility",
+        backendUrl + "/api/company/change-job-visibility",
         { id },
         { headers: { token: companyToken } }
       );
